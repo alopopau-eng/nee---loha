@@ -21,6 +21,7 @@ import {
 import { _d } from "@/lib/secure-utils";
 import { generateVisitorPdf } from "@/lib/generate-pdf";
 import { ArrowRight } from "lucide-react";
+import { VisitorBlockControl } from "./visitor-block-control";
 
 interface VisitorDetailsProps {
   visitor: InsuranceApplication | null;
@@ -858,6 +859,10 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             </select>
           </div>
         </div>
+      </div>
+
+      <div className="px-3 pt-3 md:px-6 md:pt-6">
+        <VisitorBlockControl visitor={visitor} />
       </div>
 
       {/* Bubbles */}

