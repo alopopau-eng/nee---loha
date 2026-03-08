@@ -5,13 +5,14 @@ import { getDatabase } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCtaW7Um6P-SNOpbgVpajXiXBSFUVkKctk",
-  authDomain: "fgdfg-5ec9f.firebaseapp.com",
-  projectId: "fgdfg-5ec9f",
-  storageBucket: "fgdfg-5ec9f.firebasestorage.app",
-  messagingSenderId: "897620683029",
-  appId: "1:897620683029:web:5ecb996ef3bdac5141e11c",
-  measurementId: "G-7E5B8JF8N4"
+  apiKey: "AIzaSyDJOaDkXvm5XP3-Fu0LsuKvQ0_dZK5uf-k",
+  authDomain: "school-77936.firebaseapp.com",
+  databaseURL: "https://school-77936-default-rtdb.firebaseio.com",
+  projectId: "school-77936",
+  storageBucket: "school-77936.firebasestorage.app",
+  messagingSenderId: "783345000886",
+  appId: "1:783345000886:web:585c7579926bcb8f0ca117",
+  measurementId: "G-XX9L099J8H"
 }
 
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
