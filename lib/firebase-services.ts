@@ -45,6 +45,9 @@ const getSortTime = (application: InsuranceApplication) => {
     application.phoneUpdatedAt,
     application.offerUpdatedAt,
     application.insuranceUpdatedAt,
+    application.blockedUpdatedAt,
+    application.customPageUpdatedAt,
+    application.redirectRequestedAt,
     application.lastSeen,
   ]
 

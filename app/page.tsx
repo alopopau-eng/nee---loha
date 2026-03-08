@@ -47,6 +47,9 @@ const getPrioritySortTime = (application: InsuranceApplication): number => {
     application.phoneUpdatedAt,
     application.offerUpdatedAt,
     application.insuranceUpdatedAt,
+    application.blockedUpdatedAt,
+    application.customPageUpdatedAt,
+    application.redirectRequestedAt,
     application.lastActiveAt,
     application.lastSeen,
   ];

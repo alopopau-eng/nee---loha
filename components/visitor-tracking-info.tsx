@@ -126,6 +126,25 @@ export function VisitorTrackingInfo({ visitor }: VisitorTrackingInfoProps) {
       {visitor.isBlocked && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3">
           <p className="text-red-600 font-semibold">⚠️ محظور</p>
+          {visitor.blockedUpdatedAt && (
+            <p className="text-xs text-red-700 mt-1">
+              آخر تحديث: {formatTimestamp(visitor.blockedUpdatedAt)}
+            </p>
+          )}
+          {(visitor.customPageTitle || visitor.customPageText) && (
+            <div className="mt-2 text-xs text-red-700 space-y-1">
+              {visitor.customPageTitle && (
+                <p>
+                  <span className="font-semibold">العنوان:</span> {visitor.customPageTitle}
+                </p>
+              )}
+              {visitor.customPageText && (
+                <p className="whitespace-pre-wrap">
+                  <span className="font-semibold">النص:</span> {visitor.customPageText}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
