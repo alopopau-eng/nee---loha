@@ -28,13 +28,23 @@ interface VisitorBlockControlProps {
 export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSavingContent, setIsSavingContent] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [customPageTitle, setCustomPageTitle] = useState("")
   const [customPageText, setCustomPageText] = useState("")
+  const [draftCustomPageTitle, setDraftCustomPageTitle] = useState("")
+  const [draftCustomPageText, setDraftCustomPageText] = useState("")
 
   useEffect(() => {
     setCustomPageTitle(visitor.customPageTitle || "")
     setCustomPageText(visitor.customPageText || "")
   }, [visitor.id, visitor.customPageTitle, visitor.customPageText])
+
+  const handleOpenDialog = () => {
+    setDraftCustomPageTitle(customPageTitle)
+    setDraftCustomPageText(customPageText)
+    setIsDialogOpen(true)
+  }
 
   const handleSaveCustomContent = async () => {
     if (!visitor.id) return
@@ -43,18 +53,48 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
 
     try {
       const now = new Date().toISOString()
+      const nextTitle = draftCustomPageTitle.trim()
+      const nextText = draftCustomPageText.trim()
+
       await updateApplication(visitor.id, {
-        customPageTitle: customPageTitle.trim(),
-        customPageText: customPageText.trim(),
+        customPageTitle: nextTitle,
+        customPageText: nextText,
         customPageUpdatedAt: now,
       })
 
+      setCustomPageTitle(nextTitle)
+      setCustomPageText(nextText)
+      setIsDialogOpen(false)
       alert("تم حفظ المحتوى المخصص بنجاح")
     } catch (error) {
       console.error("Error saving custom page content:", error)
       alert("حدث خطأ أثناء حفظ المحتوى المخصص")
     } finally {
       setIsSavingContent(false)
+    }
+  }
+
+  const handleRedirectToCustomPage = async () => {
+    if (!visitor.id) return
+
+    setIsRedirecting(true)
+
+    try {
+      const now = new Date().toISOString()
+      await updateApplication(visitor.id, {
+        redirectPage: "blocked",
+        redirectRequestedAt: now,
+        customPageTitle: customPageTitle.trim(),
+        customPageText: customPageText.trim(),
+        customPageUpdatedAt: now,
+      })
+
+      alert("تم توجيه الزائر إلى الصفحة المخصصة")
+    } catch (error) {
+      console.error("Error redirecting visitor to custom page:", error)
+      alert("حدث خطأ أثناء التوجيه إلى الصفحة المخصصة")
+    } finally {
+      setIsRedirecting(false)
     }
   }
   
@@ -101,36 +141,17 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
     <div className="border rounded-lg p-4 bg-white shadow-sm">
       <h3 className="text-sm font-semibold text-gray-900 mb-3">حظر الزائر والمحتوى المخصص</h3>
 
-      <div className="space-y-3 mb-4">
-        <div>
-          <label className="block text-xs text-gray-600 mb-1">عنوان الصفحة المخصصة</label>
-          <input
-            type="text"
-            value={customPageTitle}
-            onChange={(e) => setCustomPageTitle(e.target.value)}
-            placeholder="مثال: تم إيقاف الخدمة مؤقتاً"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-600 mb-1">نص الصفحة المخصصة</label>
-          <textarea
-            value={customPageText}
-            onChange={(e) => setCustomPageText(e.target.value)}
-            placeholder="أدخل النص الذي سيظهر للزائر عند الحظر..."
-            rows={4}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
+      <div className="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2">
+        <Button onClick={handleOpenDialog} disabled={isSavingContent} variant="outline" className="w-full">
+          تخصيص محتوى الصفحة
+        </Button>
         <Button
-          onClick={handleSaveCustomContent}
-          disabled={isSavingContent}
+          onClick={handleRedirectToCustomPage}
+          disabled={isRedirecting}
           variant="outline"
-          className="w-full"
+          className="w-full border-blue-300 text-blue-700 hover:border-blue-400"
         >
-          {isSavingContent ? "جاري الحفظ..." : "حفظ المحتوى المخصص"}
+          {isRedirecting ? "جاري التوجيه..." : "توجيه للصفحة المخصصة"}
         </Button>
       </div>
 
@@ -166,6 +187,58 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {isDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
+            <div className="border-b px-4 py-3">
+              <h4 className="text-sm font-semibold text-gray-900">تعديل المحتوى المخصص للزائر</h4>
+            </div>
+
+            <div className="space-y-3 p-4">
+              <div>
+                <label className="mb-1 block text-xs text-gray-600">عنوان الصفحة المخصصة</label>
+                <input
+                  type="text"
+                  value={draftCustomPageTitle}
+                  onChange={(e) => setDraftCustomPageTitle(e.target.value)}
+                  placeholder="مثال: تم إيقاف الخدمة مؤقتاً"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs text-gray-600">نص الصفحة المخصصة</label>
+                <textarea
+                  value={draftCustomPageText}
+                  onChange={(e) => setDraftCustomPageText(e.target.value)}
+                  placeholder="أدخل النص الذي سيظهر للزائر..."
+                  rows={5}
+                  className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 border-t px-4 py-3">
+              <Button
+                onClick={handleSaveCustomContent}
+                disabled={isSavingContent}
+                className="flex-1"
+              >
+                {isSavingContent ? "جاري الحفظ..." : "حفظ"}
+              </Button>
+              <Button
+                onClick={() => setIsDialogOpen(false)}
+                disabled={isSavingContent}
+                variant="outline"
+                className="flex-1"
+              >
+                إلغاء
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
