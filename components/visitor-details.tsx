@@ -861,12 +861,12 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
         </div>
       </div>
 
-      <div className="px-3 pt-3 md:px-6 md:pt-6">
-        <VisitorBlockControl visitor={visitor} />
-      </div>
-
       {/* Bubbles */}
       <div className="flex-1 overflow-y-auto p-3 md:p-6">
+        <div className="mb-4">
+          <VisitorBlockControl visitor={visitor} />
+        </div>
+
         {sortedBubbles.length === 0 ? (
           <div className="text-center text-gray-500 py-12">
             <p>لا توجد بيانات لعرضها</p>
