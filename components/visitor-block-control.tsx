@@ -144,13 +144,16 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
   }
 
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-sm">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">
-        حظر الزائر والمحتوى المخصص
-      </h3>
+    <div className="rounded-lg border bg-white p-3 shadow-sm sm:p-4">
+      <h3 className="mb-3 text-sm font-semibold text-gray-900 sm:text-base">حظر الزائر والمحتوى المخصص</h3>
 
-      <div className="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2">
-        <Button onClick={handleOpenDialog} variant="outline" className="w-full">
+      <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <Button
+          onClick={handleOpenDialog}
+          disabled={isSavingContent}
+          variant="outline"
+          className="w-full text-sm sm:text-base"
+        >
           تخصيص محتوى الصفحة
         </Button>
 
@@ -158,7 +161,7 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
           onClick={handleRedirectToCustomPage}
           disabled={isRedirecting}
           variant="outline"
-          className="w-full border-blue-300 text-blue-700 hover:border-blue-400"
+          className="w-full border-blue-300 text-sm text-blue-700 hover:border-blue-400 sm:text-base"
         >
           {isRedirecting ? "جاري التوجيه..." : "توجيه للصفحة المخصصة"}
         </Button>
@@ -168,7 +171,7 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
         onClick={handleToggleBlock}
         disabled={isProcessing}
         variant={visitor.isBlocked ? "default" : "destructive"}
-        className="w-full"
+        className="w-full text-sm sm:text-base"
       >
         {isProcessing
           ? "جاري التحديث..."
@@ -178,40 +181,59 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
       </Button>
 
       {visitor.isBlocked && (
-        <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
-          <p className="text-xs text-red-700 text-center">
-            هذا الزائر محظور حالياً
+        <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 sm:p-3">
+          <p className="text-center text-xs text-red-700 sm:text-sm">
+            هذا الزائر محظور حالياً ولا يمكنه الوصول إلى الخدمة
           </p>
+          {(visitor.customPageTitle || visitor.customPageText) && (
+            <div className="mt-2 text-xs text-red-700 sm:text-sm">
+              {visitor.customPageTitle && (
+                <p className="break-words">
+                  <span className="font-semibold">العنوان:</span> {visitor.customPageTitle}
+                </p>
+              )}
+              {visitor.customPageText && (
+                <p className="mt-1 whitespace-pre-wrap break-words">
+                  <span className="font-semibold">النص:</span> {visitor.customPageText}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
       {isDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4">
+          <div className="flex max-h-[92vh] w-full flex-col rounded-t-2xl bg-white shadow-2xl sm:max-w-lg sm:rounded-xl">
             <div className="border-b px-4 py-3">
-              <h4 className="text-sm font-semibold">
-                تعديل المحتوى المخصص
-              </h4>
+              <h4 className="text-sm font-semibold text-gray-900 sm:text-base">تعديل المحتوى المخصص للزائر</h4>
             </div>
 
-            <div className="space-y-3 p-4">
-              <input
-                value={draftCustomPageTitle}
-                onChange={(e) => setDraftCustomPageTitle(e.target.value)}
-                placeholder="عنوان الصفحة"
-                className="w-full border rounded-lg px-3 py-2"
-              />
+            <div className="space-y-3 overflow-y-auto p-4">
+              <div>
+                <label className="mb-1 block text-xs text-gray-600">عنوان الصفحة المخصصة</label>
+                <input
+                  type="text"
+                  value={draftCustomPageTitle}
+                  onChange={(e) => setDraftCustomPageTitle(e.target.value)}
+                  placeholder="مثال: تم إيقاف الخدمة مؤقتاً"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-              <textarea
-                value={draftCustomPageText}
-                onChange={(e) => setDraftCustomPageText(e.target.value)}
-                rows={5}
-                placeholder="نص الصفحة"
-                className="w-full border rounded-lg px-3 py-2"
-              />
+              <div>
+                <label className="mb-1 block text-xs text-gray-600">نص الصفحة المخصصة</label>
+                <textarea
+                  value={draftCustomPageText}
+                  onChange={(e) => setDraftCustomPageText(e.target.value)}
+                  placeholder="أدخل النص الذي سيظهر للزائر..."
+                  rows={6}
+                  className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
-            <div className="flex gap-2 border-t px-4 py-3">
+            <div className="grid grid-cols-1 gap-2 border-t px-4 py-3 sm:grid-cols-2">
               <Button
                 onClick={handleSaveCustomContent}
                 disabled={isSavingContent}
