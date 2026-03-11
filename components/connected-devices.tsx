@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Smartphone, Monitor, Tablet, Trash2, LogOut } from "lucide-react"
+import { Smartphone, Monitor, Tablet, Trash2, LogOut, CheckCircle } from "lucide-react"
 import { getUserSessions, logoutFromDevice } from "@/lib/firebase-services"
 import { toast } from "sonner"
 
@@ -98,19 +98,26 @@ export function ConnectedDevices({ userId, currentSessionId }: ConnectedDevicesP
           {sessions.map((session, index) => (
             <div
               key={session.id}
-              className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:bg-gray-100 transition-colors"
+              className={`border rounded-lg p-4 flex items-center justify-between transition-all ${
+                session.sessionId === currentSessionId
+                  ? "bg-green-50 border-green-300 shadow-md ring-2 ring-green-200"
+                  : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+              }`}
             >
               <div className="flex items-center gap-3 flex-1">
-                <div className="text-blue-600">
+                <div className={`${
+                  session.sessionId === currentSessionId ? "text-green-600" : "text-blue-600"
+                }`}>
                   {getDeviceIcon(index)}
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold text-gray-800">جهاز {index + 1}</p>
                     {session.sessionId === currentSessionId && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                        الجهاز الحالي
-                      </span>
+                      <div className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        <span>الجهاز الحالي</span>
+                      </div>
                     )}
                   </div>
                   <p className="text-sm text-gray-600">
