@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Plus, Trash2, CreditCard, Globe } from "lucide-react"
+import { X, Plus, Trash2, CreditCard, Globe, Smartphone } from "lucide-react"
 import { 
   getSettings, 
   addBlockedCardBin, 
@@ -10,6 +10,8 @@ import {
   removeAllowedCountry,
   type Settings 
 } from "@/lib/firebase/settings"
+import { ConnectedDevices } from "@/components/connected-devices"
+import { useAuth } from "@/lib/auth-context"
 import { toast } from "sonner"
 
 interface SettingsModalProps {
@@ -40,6 +42,7 @@ const COUNTRIES = [
 ]
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+  const { user, sessionId } = useAuth()
   const [settings, setSettings] = useState<Settings>({
     blockedCardBins: [],
     allowedCountries: []
@@ -47,7 +50,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [newBinsInput, setNewBinsInput] = useState("")
   const [selectedCountry, setSelectedCountry] = useState("")
   const [loading, setLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<"cards" | "countries">("cards")
+  const [activeTab, setActiveTab] = useState<"cards" | "countries" | "devices">("cards")
 
   // Load settings when modal opens
   useEffect(() => {
@@ -161,7 +164,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Tabs */}
-        <div className="grid grid-cols-2 border-b border-gray-200">
+        <div className="grid grid-cols-3 border-b border-gray-200">
           <button
             onClick={() => setActiveTab("cards")}
             className={`px-2 py-3 text-xs font-semibold transition-colors sm:px-6 sm:py-4 sm:text-base ${
@@ -186,6 +189,19 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <div className="flex items-center justify-center gap-1.5 sm:gap-2">
               <Globe className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>تقييد الوصول حسب الدولة</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("devices")}
+            className={`px-2 py-3 text-xs font-semibold transition-colors sm:px-6 sm:py-4 sm:text-base ${
+              activeTab === "devices"
+                ? "text-green-600 border-b-2 border-green-600 bg-green-50"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+              <Smartphone className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span>الأجهزة المتصلة</span>
             </div>
           </button>
         </div>
@@ -262,7 +278,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 )}
               </div>
             </div>
-          ) : (
+          ) : activeTab === "countries" ? (
             <div className="space-y-6">
               {/* Title and Description */}
               <div className="text-center">
@@ -340,7 +356,22 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 )}
               </div>
             </div>
-          )}
+          ) : activeTab === "devices" ? (
+            <div className="space-y-6">
+              {/* Title and Description */}
+              <div className="text-center">
+                <h3 className="mb-2 text-lg font-bold text-gray-800 sm:text-xl">الأجهزة المتصلة</h3>
+                <p className="text-sm text-gray-600">
+                  إدارة جميع الأجهزة المتصلة بحسابك. يمكنك تسجيل الخروج من أي جهاز.
+                </p>
+              </div>
+
+              {/* Connected Devices */}
+              {user?.uid && (
+                <ConnectedDevices userId={user.uid} currentSessionId={sessionId} />
+              )}
+            </div>
+          ) : null}
         </div>
 
         {/* Footer */}

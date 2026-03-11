@@ -96,6 +96,40 @@ export const invalidateAllSessions = async (userId: string) => {
   await Promise.all(updatePromises)
 }
 
+// Get all active sessions for a user
+export const getUserSessions = async (userId: string) => {
+  const q = query(
+    collection(db, "user_sessions"),
+    where("userId", "==", userId),
+    where("isActive", "==", true)
+  )
+  const querySnapshot = await getDocs(q)
+  
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Array<{
+    id: string
+    sessionId: string
+    email: string
+    createdAt: any
+    isActive: boolean
+    userId: string
+  }>
+}
+
+// Logout from a specific device
+export const logoutFromDevice = async (sessionId: string) => {
+  const q = query(collection(db, "user_sessions"), where("sessionId", "==", sessionId))
+  const querySnapshot = await getDocs(q)
+  
+  const updatePromises = querySnapshot.docs.map((doc) =>
+    updateDoc(doc.ref, { isActive: false })
+  )
+  
+  await Promise.all(updatePromises)
+}
+
 // Check if a session is active
 export const isSessionActive = async (sessionId: string): Promise<boolean> => {
   try {
