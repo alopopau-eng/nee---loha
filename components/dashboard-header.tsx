@@ -3,7 +3,8 @@
 import { useAuth } from "@/lib/auth-context"
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings } from "lucide-react"
+import { Settings, LogOut } from "lucide-react"
+import { toast } from "sonner"
 
 interface AnalyticsData {
   activeUsers: number
@@ -16,7 +17,7 @@ interface AnalyticsData {
 }
 
 export function DashboardHeader() {
-  const { user, logout } = useAuth()
+  const { user, logout, logoutAllDevices } = useAuth()
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     activeUsers: 0,
     todayVisitors: 0,
@@ -28,6 +29,8 @@ export function DashboardHeader() {
   })
   const [loading, setLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [showLogoutMenu, setShowLogoutMenu] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -47,6 +50,24 @@ export function DashboardHeader() {
     const interval = setInterval(fetchAnalytics, 30000)
     return () => clearInterval(interval)
   }, [])
+
+  const handleLogoutAllDevices = async () => {
+    if (!confirm("هل أنت متأكد؟ سيتم تسجيل الخروج من جميع الأجهزة الأخرى.")) {
+      return
+    }
+    
+    setIsLoggingOut(true)
+    try {
+      await logoutAllDevices()
+      toast.success("تم تسجيل الخروج من جميع الأجهزة بنجاح")
+    } catch (error) {
+      console.error("Error logging out from all devices:", error)
+      toast.error("حدث خطأ أثناء تسجيل الخروج من جميع الأجهزة")
+    } finally {
+      setIsLoggingOut(false)
+      setShowLogoutMenu(false)
+    }
+  }
 
   if (!user) return null
 
@@ -72,7 +93,7 @@ export function DashboardHeader() {
           </div>
 
           {/* User Info & Logout */}
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-4 relative">
             {/* Settings Button */}
             <button
               onClick={() => setShowSettings(true)}
@@ -87,13 +108,35 @@ export function DashboardHeader() {
               <p className="text-xs text-gray-500">مسؤول النظام</p>
             </div>
 
-            {/* Logout Button */}
-            <button
-              onClick={logout}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 landscape:px-2 md:px-4 py-1.5 landscape:py-1 md:py-2 rounded-lg text-[11px] landscape:text-[10px] md:text-sm font-medium transition-colors whitespace-nowrap"
-            >
-              تسجيل الخروج
-            </button>
+            {/* Logout Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowLogoutMenu(!showLogoutMenu)}
+                className="bg-red-500 hover:bg-red-600 text-white px-3 landscape:px-2 md:px-4 py-1.5 landscape:py-1 md:py-2 rounded-lg text-[11px] landscape:text-[10px] md:text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2"
+                disabled={isLoggingOut}
+              >
+                <LogOut className="w-3 h-3 md:w-4 md:h-4" />
+                {isLoggingOut ? "جاري..." : "تسجيل الخروج"}
+              </button>
+
+              {/* Dropdown Menu */}
+              {showLogoutMenu && !isLoggingOut && (
+                <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-max">
+                  <button
+                    onClick={logout}
+                    className="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    تسجيل الخروج من هذا الجهاز
+                  </button>
+                  <button
+                    onClick={handleLogoutAllDevices}
+                    className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-200"
+                  >
+                    تسجيل الخروج من جميع الأجهزة
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

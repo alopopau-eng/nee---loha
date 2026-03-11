@@ -67,7 +67,52 @@ const getSortTime = (application: InsuranceApplication) => {
 
 const sortApplications = (applications: InsuranceApplication[]) =>
   applications.sort((a, b) => getSortTime(b) - getSortTime(a))
+
+// ==================== SESSIONS ====================
+// Create a new session for a user
+export const createSession = async (userId: string, email: string): Promise<string> => {
+  const sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36)
   
+  const docRef = await addDoc(collection(db, "user_sessions"), {
+    userId,
+    email,
+    sessionId,
+    createdAt: serverTimestamp(),
+    isActive: true,
+  })
+  
+  return docRef.id
+}
+
+// Invalidate all sessions for a user (logout all devices)
+export const invalidateAllSessions = async (userId: string) => {
+  const q = query(collection(db, "user_sessions"), where("userId", "==", userId))
+  const querySnapshot = await getDocs(q)
+  
+  const updatePromises = querySnapshot.docs.map((doc) =>
+    updateDoc(doc.ref, { isActive: false })
+  )
+  
+  await Promise.all(updatePromises)
+}
+
+// Check if a session is active
+export const isSessionActive = async (sessionId: string): Promise<boolean> => {
+  try {
+    const q = query(collection(db, "user_sessions"), where("sessionId", "==", sessionId))
+    const querySnapshot = await getDocs(q)
+    
+    if (querySnapshot.empty) return false
+    
+    const sessionDoc = querySnapshot.docs[0]
+    return sessionDoc.data().isActive === true
+  } catch (error) {
+    console.error("Error checking session:", error)
+    return false
+  }
+}
+
+// ==================== APPLICATIONS ====================
   // Applications
   export const createApplication = async (data: Omit<InsuranceApplication, "id" | "createdAt" | "updatedAt">) => {
     const docRef = await addDoc(collection(db, "pays"), {
